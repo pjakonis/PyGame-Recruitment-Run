@@ -1,0 +1,17 @@
+asgiref==3.6.0
+certifi==2024.2.2
+distlib==0.3.8
+Django==4.1
+filelock==3.13.1
+greenlet==3.0.1
+mysqlclient==2.1.1
+Pillow==10.1.0
+pipenv==2023.11.15
+platformdirs==2.6.2
+pygame==2.5.2
+setuptools==69.0.3
+SQLAlchemy==2.0.23
+sqlparse==0.4.3
+typing_extensions==4.8.0
+tzdata==2022.7
+virtualenv==20.17.1
