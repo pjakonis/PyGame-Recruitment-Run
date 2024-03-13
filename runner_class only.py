@@ -379,7 +379,6 @@ while True:
 
 
 
-
     # Update the display
     pygame.display.update()
     clock.tick(60)
