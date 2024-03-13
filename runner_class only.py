@@ -87,15 +87,32 @@ class Obstacle(pygame.sprite.Sprite):
     def __init__(self, type):
         super().__init__()
 
-        if type == 'fly':
-            fly_1 = pygame.image.load('graphics/fly/fly3.png').convert_alpha()
-            fly_2 = pygame.image.load('graphics/fly/fly4.png').convert_alpha()
-            self.frames = [fly_1, fly_2]
-            y_pos = choice([232, 260, 150])
-        else:
-            snail_1 = pygame.image.load('graphics/snail/c_1.png').convert_alpha()
-            snail_2 = pygame.image.load('graphics/snail/c_2.png').convert_alpha()
-            self.frames = [snail_1, snail_2]
+        if type == 'Sodra':
+            sodra_1 = pygame.image.load('graphics/Obstacles/Sodra_1.png').convert_alpha()
+            sodra_2 = pygame.image.load('graphics/Obstacles/Sodra_2.png').convert_alpha()
+            self.frames = [sodra_1, sodra_2]
+            y_pos = 275
+        elif type == 'C':
+            c_1 = pygame.image.load('graphics/Obstacles/C_1.png').convert_alpha()
+            c_2 = pygame.image.load('graphics/Obstacles/C_2.png').convert_alpha()
+            self.frames = [c_1, c_2]
+            y_pos = 300
+        elif type == 'VMI':
+            VMI_1 = pygame.image.load('graphics/Obstacles/VMI_1.png').convert_alpha()
+            VMI_2 = pygame.image.load('graphics/Obstacles/VMI_2.png').convert_alpha()
+            self.frames = [VMI_1, VMI_2]
+            y_pos = 232
+        elif type == 'Stock':
+            Stock_1 = pygame.image.load('graphics/Obstacles/Stock_1.png').convert_alpha()
+            Stock_2 = pygame.image.load('graphics/Obstacles/Stock_2.png').convert_alpha()
+            self.frames = [Stock_1, Stock_2]
+            y_pos = 300
+        elif type == 'Netflix':
+            Netflix_1 = pygame.image.load('graphics/Obstacles/Netflix_1.png').convert_alpha()
+            Netflix_2 = pygame.image.load('graphics/Obstacles/Netflix_2.png').convert_alpha()
+            Netflix_3 = pygame.image.load('graphics/Obstacles/Netflix_3.png').convert_alpha()
+            Netflix_4 = pygame.image.load('graphics/Obstacles/Netflix_4.png').convert_alpha()
+            self.frames = [Netflix_1, Netflix_2, Netflix_3, Netflix_4]
             y_pos = 300
 
         self.animation_index = 0
@@ -154,6 +171,9 @@ last_speed_increase = 0
 millis = 1500
 sky_speed = 1
 ground_speed = 4
+sun_speed = 1
+clouds_speed = 2
+
 
 high_score = get_high_score()
 
@@ -164,20 +184,34 @@ player = pygame.sprite.GroupSingle()
 player.add(Player())
 obstacle_group = pygame.sprite.Group()
 
-sky_surf = pygame.image.load('graphics/Sky.png').convert()
+background = pygame.image.load('graphics/Sky/Background.png').convert_alpha()
+background_rect = background.get_rect(topleft=(0, 0))
+
+sky_surf_1 = pygame.image.load('graphics/Sky/Sky_1.png').convert_alpha()
+sky_surf_2 = pygame.image.load('graphics/Sky/Sky_2.png').convert_alpha()
+sky_rect_1 = sky_surf_1.get_rect(topleft=(0, 0))
+sky_rect_2 = sky_surf_2.get_rect(topleft=(800, 0))
+
+clouds_surf = pygame.image.load('graphics/Sky/Clouds.png').convert_alpha()
+clouds_rect_1 = clouds_surf.get_rect(topleft=(0, 20))
+clouds_rect_2 = clouds_surf.get_rect(topleft=(800, 20))
+
+sun_surf = pygame.image.load('graphics/Sky/Sun.png').convert_alpha()
+sun_rect = sun_surf.get_rect(topright=(800, 10))
+
 
 # Load and set up graphics
-sky_rect_1 = sky_surf.get_rect(topleft=(0, 0))
-sky_rect_2 = sky_surf.get_rect(topleft=(800, 0))
-ground_surf = pygame.image.load('graphics/ground.png').convert()
+
+
+ground_surf = pygame.image.load('graphics/Ground/Ground.png').convert()
 
 ground_rect_1 = ground_surf.get_rect(topleft=(0, 300))
-ground_rect_2 = ground_surf.get_rect(topleft=(800, 300))
-player_stand = pygame.image.load('graphics/player/player_stand_2.png').convert_alpha()
+ground_rect_2 = ground_surf.get_rect(topleft=(811, 300))
+player_stand = pygame.image.load('graphics/Player/player_stand_2.png').convert_alpha()
 
 player_stand = pygame.transform.rotozoom(player_stand, 0, 2)
 player_stand_rect = player_stand.get_rect(center=(400, 200))
-player_dead = pygame.image.load('graphics/player/player_dead.png').convert_alpha()
+player_dead = pygame.image.load('graphics/Player/player_dead.png').convert_alpha()
 
 player_dead = pygame.transform.rotozoom(player_dead, 0, 2)
 player_dead_rect = player_dead.get_rect(center=(400, 200))
@@ -196,7 +230,7 @@ obstacle_timer = pygame.USEREVENT + 1
 # Timer for obstacle generation
 pygame.time.set_timer(obstacle_timer, millis)
 def update_obstacle_speed():
-    global obstacle_speed, start_time, last_speed_increase, millis, sky_speed, ground_speed
+    global obstacle_speed, start_time, last_speed_increase, millis, sky_speed, ground_speed, sun_speed, clouds_speed
     elapsed_time = pygame.time.get_ticks() - start_time  # Get the elapsed time in milliseconds
     if elapsed_time // 10000 > last_speed_increase:
         # Only increase obstacle_speed if it's below 15
@@ -234,7 +268,7 @@ while True:
         if game_active:
             update_obstacle_speed()
             if event.type == obstacle_timer:
-                obstacle_group.add(Obstacle(choice(['fly', 'snail', 'snail', 'snail'])))
+                obstacle_group.add(Obstacle(choice(['Sodra', 'VMI', 'Netflix', 'Stock', 'C'])))
 
         else:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
@@ -242,24 +276,47 @@ while True:
                 start_time = int(pygame.time.get_ticks() / 1000)
 
     if game_active:
-        # Draw the background
-        screen.blit(sky_surf, sky_rect_1)
-        screen.blit(sky_surf, sky_rect_2)
-        sky_rect_2.x -= sky_speed
+
+        screen.blit(background, background_rect)
+
+        screen.blit(sun_surf, sun_rect)
+
+        screen.blit(clouds_surf, clouds_rect_1)
+        screen.blit(clouds_surf, clouds_rect_2)
+
+        screen.blit(sky_surf_1, sky_rect_1)
+        screen.blit(sky_surf_2, sky_rect_2)
+
+
+        clouds_rect_2.x -= clouds_speed
+        clouds_rect_1.x -= clouds_speed
+
+        sun_rect.x -= sun_speed
+
         sky_rect_1.x -= sky_speed
+        sky_rect_2.x -= sky_speed
+
+        if sun_rect.right <= 0:
+            sun_rect.x = 800
+        if clouds_rect_1.right <= 0:
+            clouds_rect_1.x = 800
+        if clouds_rect_2.right <= 0:
+            clouds_rect_2.x = 800
         if sky_rect_1.right <= 0:
-            sky_rect_1.x = 800
+            sky_rect_1.x = 799
         if sky_rect_2.right <= 0:
-            sky_rect_2.x = 800
+            sky_rect_2.x = 799
+
+
 
         screen.blit(ground_surf, ground_rect_1)
         screen.blit(ground_surf, ground_rect_2)
         ground_rect_1.x -= ground_speed
         ground_rect_2.x -= ground_speed
         if ground_rect_1.right <= 0:
-            ground_rect_1.x = 800
+            ground_rect_1.x = 811
         if ground_rect_2.right <= 0:
-            ground_rect_2.x = 800
+            ground_rect_2.x = 811
 
         # Display the score
         score = display_score()
@@ -288,10 +345,29 @@ while True:
         # Display the intro or game over screen
         screen.fill((94, 129, 162))
         screen.blit(player_stand, player_stand_rect)
+        sky_rect_1 = sky_surf_1.get_rect(topleft=(0, 0))
+        sky_rect_2 = sky_surf_2.get_rect(topleft=(800, 0))
+        clouds_rect_1 = clouds_surf.get_rect(topleft=(0, 20))
+        clouds_rect_2 = clouds_surf.get_rect(topleft=(800, 20))
+        sun_rect = sun_surf.get_rect(topright=(800, 10))
+
+
+        obstacle_speed = 5
+        last_speed_increase = 0
+        millis = 1500
+        sky_speed = 1
+        ground_speed = 4
+        sun_speed = 1
+        clouds_speed = 2
 
         if score == 0:
             screen.blit(game_message_1, game_message_1_rect)
             screen.blit(game_name_1, game_name_1_rect)
+            score_message = font.render(
+                f'< up > to Jump                                             < down > to Duck', False,
+                (111, 196, 169))
+            score_message_rect = score_message.get_rect(center=(400, 200))
+            screen.blit(score_message, score_message_rect)
         else:
             score_message = font.render(f'Your score: {score}                                       High score: {high_score}', False, (111, 196, 169))
             score_message_rect = score_message.get_rect(center=(400, 200))
@@ -299,15 +375,11 @@ while True:
             screen.blit(player_dead, player_dead_rect)
             screen.blit(game_name_2, game_name_2_rect)
             screen.blit(game_message_2, game_message_2_rect)
-            obstacle_speed = 5
-            last_speed_increase = 0
-            millis = 1500
-            sky_speed = 1
-            ground_speed = 4
+
+
 
 
 
     # Update the display
     pygame.display.update()
     clock.tick(60)
-# Main game loop
