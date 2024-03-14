@@ -33,13 +33,12 @@ class Player(pygame.sprite.Sprite):
 
         self.player_jump = pygame.image.load('graphics/player/jump_2.png').convert_alpha()
 
-
         self.image = self.player_walk[self.player_index]
         self.rect = self.image.get_rect(midbottom=(80, 300))
         self.gravity = 0
 
-        self.jump_sound = pygame.mixer.Sound('audio/jump.mp3')
-        self.jump_sound.set_volume(0.1)
+        self.jump_sound = pygame.mixer.Sound('audio/jump.wav')
+        self.jump_sound.set_volume(1)
 
     def player_input(self):
         keys = pygame.key.get_pressed()
@@ -120,7 +119,6 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom=(randint(850, 1000), y_pos))
         self.rect.inflate_ip(-20, 0)
 
-
     def animation_state(self):
         self.animation_index += 0.1
         if self.animation_index >= len(self.frames):
@@ -129,7 +127,7 @@ class Obstacle(pygame.sprite.Sprite):
 
     def update(self):
         self.animation_state()
-        self.rect.x -= obstacle_speed  # Use the global obstacle_speed variable
+        self.rect.x -= obstacle_speed
         self.destroy()
 
     def destroy(self):
@@ -149,7 +147,13 @@ def display_score():
 
 
 def collision_sprite():
+    global music_started
+    game_over_sound = pygame.mixer.Sound('audio/game_over.wav')
+    game_over_sound.set_volume(3)
     if pygame.sprite.spritecollide(player.sprite, obstacle_group, False):
+        pygame.mixer.music.stop()
+        music_started = False
+        game_over_sound.play()
         obstacle_group.empty()
         pygame.display.update()
         pygame.time.wait(1000)
@@ -159,10 +163,15 @@ def collision_sprite():
 
 
 pygame.init()
+pygame.mixer.music.load('audio/Run.wav')
+music_started = False
+
 screen = pygame.display.set_mode((800, 400))
+
 pygame.display.set_caption('Recruitment Run')
 clock = pygame.time.Clock()
 font = pygame.font.Font('font/Pixeltype.ttf', 50)
+
 game_active = False
 start_time = 0
 score = 0
@@ -174,13 +183,10 @@ ground_speed = 4
 sun_speed = 1
 clouds_speed = 2
 
-
 high_score = get_high_score()
 
-# Load the high score
 player = pygame.sprite.GroupSingle()
 
-# Create player and obstacle groups
 player.add(Player())
 obstacle_group = pygame.sprite.Group()
 
@@ -188,8 +194,8 @@ background = pygame.image.load('graphics/Sky/Background.png').convert_alpha()
 background_rect = background.get_rect(topleft=(0, 0))
 
 sky_surf_1 = pygame.image.load('graphics/Sky/Sky_1.png').convert_alpha()
-sky_surf_2 = pygame.image.load('graphics/Sky/Sky_2.png').convert_alpha()
-sky_rect_1 = sky_surf_1.get_rect(topleft=(0, 0))
+sky_surf_2 = pygame.image.load('graphics/Sky/Sky_3.png').convert_alpha()
+sky_rect_1 = sky_surf_1.get_rect(topleft=(1, 0))
 sky_rect_2 = sky_surf_2.get_rect(topleft=(800, 0))
 
 clouds_surf = pygame.image.load('graphics/Sky/Clouds.png').convert_alpha()
@@ -199,24 +205,19 @@ clouds_rect_2 = clouds_surf.get_rect(topleft=(800, 20))
 sun_surf = pygame.image.load('graphics/Sky/Sun.png').convert_alpha()
 sun_rect = sun_surf.get_rect(topright=(800, 10))
 
-
-# Load and set up graphics
-
-
 ground_surf = pygame.image.load('graphics/Ground/Ground.png').convert()
-
 ground_rect_1 = ground_surf.get_rect(topleft=(0, 300))
 ground_rect_2 = ground_surf.get_rect(topleft=(811, 300))
+
 player_stand = pygame.image.load('graphics/Player/player_stand_2.png').convert_alpha()
 
 player_stand = pygame.transform.rotozoom(player_stand, 0, 2)
 player_stand_rect = player_stand.get_rect(center=(400, 200))
 player_dead = pygame.image.load('graphics/Player/player_dead.png').convert_alpha()
-
 player_dead = pygame.transform.rotozoom(player_dead, 0, 2)
 player_dead_rect = player_dead.get_rect(center=(400, 200))
-game_name_1 = font.render('Recruitment Run', False, (111, 196, 169))
 
+game_name_1 = font.render('Recruitment Run', False, (111, 196, 169))
 game_name_1_rect = game_name_1.get_rect(center=(400, 80))
 game_name_2 = font.render('GAME OVER', False, (111, 196, 169))
 game_name_2_rect = game_name_2.get_rect(center=(400, 80))
@@ -225,39 +226,36 @@ game_message_1 = font.render('Press < Enter > to find a job', False, (111, 196, 
 game_message_1_rect = game_message_1.get_rect(center=(400, 330))
 game_message_2 = font.render('Press < Enter > to run again', False, (111, 196, 169))
 game_message_2_rect = game_message_2.get_rect(center=(400, 330))
+
 obstacle_timer = pygame.USEREVENT + 1
 
-# Timer for obstacle generation
 pygame.time.set_timer(obstacle_timer, millis)
+
+
 def update_obstacle_speed():
     global obstacle_speed, start_time, last_speed_increase, millis, sky_speed, ground_speed, sun_speed, clouds_speed
-    elapsed_time = pygame.time.get_ticks() - start_time  # Get the elapsed time in milliseconds
+    elapsed_time = pygame.time.get_ticks() - start_time
     if elapsed_time // 10000 > last_speed_increase:
-        # Only increase obstacle_speed if it's below 15
         if obstacle_speed < 15:
             obstacle_speed += 1
-            # Ensure obstacle_speed doesn't go above 15
             obstacle_speed = min(obstacle_speed, 15)
 
         last_speed_increase = elapsed_time // 10000
 
-        # Only decrease millis if it's above 700
         if millis > 600:
             millis -= 100
-            # Ensure millis doesn't go below 700
             millis = max(millis, 500)
 
         if sky_speed < 5:
             sky_speed += 1
-            # Ensure obstacle_speed doesn't go above 15
             sky_speed = min(sky_speed, 5)
 
         if ground_speed < 15:
             ground_speed += 1
-            # Ensure obstacle_speed doesn't go above 15
             ground_speed = min(ground_speed, 15)
 
         pygame.time.set_timer(obstacle_timer, millis)
+
 
 while True:
     for event in pygame.event.get():
@@ -266,6 +264,9 @@ while True:
             exit()
 
         if game_active:
+            if not music_started:
+                pygame.mixer.music.play(-1)
+                music_started = True
             update_obstacle_speed()
             if event.type == obstacle_timer:
                 obstacle_group.add(Obstacle(choice(['Sodra', 'VMI', 'Netflix', 'Stock', 'C'])))
@@ -287,7 +288,6 @@ while True:
         screen.blit(sky_surf_1, sky_rect_1)
         screen.blit(sky_surf_2, sky_rect_2)
 
-
         clouds_rect_2.x -= clouds_speed
         clouds_rect_1.x -= clouds_speed
 
@@ -303,11 +303,9 @@ while True:
         if clouds_rect_2.right <= 0:
             clouds_rect_2.x = 800
         if sky_rect_1.right <= 0:
-            sky_rect_1.x = 799
-        if sky_rect_2.right <= 0:
-            sky_rect_2.x = 799
-
-
+            sky_rect_1.x = 800
+        if sky_rect_2.right <= 10:
+            sky_rect_2.x = 800
 
         screen.blit(ground_surf, ground_rect_1)
         screen.blit(ground_surf, ground_rect_2)
@@ -318,39 +316,32 @@ while True:
         if ground_rect_2.right <= 0:
             ground_rect_2.x = 811
 
-        # Display the score
         score = display_score()
 
-        # Draw and update the player and obstacles
         player.draw(screen)
         player.update()
 
         obstacle_group.draw(screen)
         obstacle_group.update()
 
-        # Check for collisions
         game_active = collision_sprite()
 
-        # Update high score if the game has just ended
         if not game_active and score > high_score:
             high_score = score
             update_high_score(high_score)
 
-        # # Debug collision boxes
         # pygame.draw.rect(screen, (255, 0, 0), player.sprite.rect, 2)
         # for obstacle in obstacle_group:
         #     pygame.draw.rect(screen, (255, 0, 0), obstacle.rect, 2)
 
     else:
-        # Display the intro or game over screen
         screen.fill((94, 129, 162))
         screen.blit(player_stand, player_stand_rect)
-        sky_rect_1 = sky_surf_1.get_rect(topleft=(0, 0))
+        sky_rect_1 = sky_surf_1.get_rect(topleft=(1, 0))
         sky_rect_2 = sky_surf_2.get_rect(topleft=(800, 0))
         clouds_rect_1 = clouds_surf.get_rect(topleft=(0, 20))
         clouds_rect_2 = clouds_surf.get_rect(topleft=(800, 20))
         sun_rect = sun_surf.get_rect(topright=(800, 10))
-
 
         obstacle_speed = 5
         last_speed_increase = 0
@@ -369,16 +360,14 @@ while True:
             score_message_rect = score_message.get_rect(center=(400, 200))
             screen.blit(score_message, score_message_rect)
         else:
-            score_message = font.render(f'Your score: {score}                                       High score: {high_score}', False, (111, 196, 169))
+            score_message = font.render(
+                f'Your score: {score}                                       High score: {high_score}', False,
+                (111, 196, 169))
             score_message_rect = score_message.get_rect(center=(400, 200))
             screen.blit(score_message, score_message_rect)
             screen.blit(player_dead, player_dead_rect)
             screen.blit(game_name_2, game_name_2_rect)
             screen.blit(game_message_2, game_message_2_rect)
 
-
-
-
-    # Update the display
     pygame.display.update()
     clock.tick(60)
