@@ -171,6 +171,19 @@ screen = pygame.display.set_mode((800, 400))
 pygame.display.set_caption('Recruitment Run')
 clock = pygame.time.Clock()
 font = pygame.font.Font('font/Pixeltype.ttf', 50)
+font_2 = pygame.font.Font('font/Pixeltype.ttf', 20)
+
+game_name_1 = font.render('Recruitment Run', False, (111, 196, 169))
+game_name_1_rect = game_name_1.get_rect(center=(400, 80))
+game_name_2 = font.render('GAME OVER', False, (111, 196, 169))
+game_name_2_rect = game_name_2.get_rect(center=(400, 80))
+
+game_message_1 = font.render('Press < Enter > to find a job', False, (111, 196, 169))
+game_message_1_rect = game_message_1.get_rect(center=(400, 330))
+game_message_2 = font.render('Press < Enter > to run again', False, (111, 196, 169))
+game_message_2_rect = game_message_2.get_rect(center=(400, 330))
+game_credit = font_2.render('2024 - Art and Music by Paulius J.', False, (111, 196, 169))
+game_credit_rect = game_credit.get_rect(center=(400, 380))
 
 game_active = False
 start_time = 0
@@ -216,16 +229,6 @@ player_stand_rect = player_stand.get_rect(center=(400, 200))
 player_dead = pygame.image.load('graphics/Player/player_dead.png').convert_alpha()
 player_dead = pygame.transform.rotozoom(player_dead, 0, 2)
 player_dead_rect = player_dead.get_rect(center=(400, 200))
-
-game_name_1 = font.render('Recruitment Run', False, (111, 196, 169))
-game_name_1_rect = game_name_1.get_rect(center=(400, 80))
-game_name_2 = font.render('GAME OVER', False, (111, 196, 169))
-game_name_2_rect = game_name_2.get_rect(center=(400, 80))
-
-game_message_1 = font.render('Press < Enter > to find a job', False, (111, 196, 169))
-game_message_1_rect = game_message_1.get_rect(center=(400, 330))
-game_message_2 = font.render('Press < Enter > to run again', False, (111, 196, 169))
-game_message_2_rect = game_message_2.get_rect(center=(400, 330))
 
 obstacle_timer = pygame.USEREVENT + 1
 
@@ -342,6 +345,7 @@ while True:
         clouds_rect_1 = clouds_surf.get_rect(topleft=(0, 20))
         clouds_rect_2 = clouds_surf.get_rect(topleft=(800, 20))
         sun_rect = sun_surf.get_rect(topright=(800, 10))
+        screen.blit(game_credit, game_credit_rect)
 
         obstacle_speed = 5
         last_speed_increase = 0
