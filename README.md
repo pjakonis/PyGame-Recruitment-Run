@@ -1,5 +1,7 @@
 # Recruitment Run
 
+![Alt text](https://i.postimg.cc/jjJKJby2/Screen-Shot-2024-04-05-at-4-03-31-PM.png)
+
 ## Overview
 Recruitment Run is an engaging side-scrolling game built with Pygame, where the player's objective is to navigate a character through various obstacles to achieve the highest score. This game provides a straightforward yet captivating gameplay experience, with intuitive controls and dynamic obstacle generation. All music and art in the game are original creations, adding a unique and personal touch to the gameplay experience.
 
